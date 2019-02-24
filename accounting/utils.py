@@ -135,7 +135,7 @@ class PolicyAccounting(object):
         invoices.append(first_invoice)
 
         if self.policy.billing_schedule == "Annual":
-            print "Annual billing schedule invoices has been created!"
+            print "Annual billing schedule invoice has been created!"
             pass
         elif self.policy.billing_schedule == "Two-Pay":
             # due amount is 1 Nth of the total amount where N is the value of the policy's billing schedule
@@ -156,7 +156,7 @@ class PolicyAccounting(object):
                                   bill_date + relativedelta(months=1, days=14),  # cancels after 6 weeks from billing
                                   self.policy.annual_premium / billing_schedules.get(self.policy.billing_schedule))
                 invoices.append(invoice)
-                print "Semi-Annual billing schedule invoices has been created!"
+            print "Semi-Annual billing schedule invoices have been created!"
 
         elif self.policy.billing_schedule == "Quarterly":
             first_invoice.amount_due = first_invoice.amount_due / billing_schedules.get(self.policy.billing_schedule)
@@ -170,11 +170,21 @@ class PolicyAccounting(object):
                                   bill_date + relativedelta(months=1, days=14),  # cancels after 6 weeks form billing
                                   self.policy.annual_premium / billing_schedules.get(self.policy.billing_schedule))
                 invoices.append(invoice)
-                print "Quarterly billing schedule invoices has been created!"
+            print "Quarterly billing schedule invoices have been created!"
 
         elif self.policy.billing_schedule == "Monthly":
-            # TODO: implement monthly billing logic
-            pass
+            # setting amount due for the first invoice
+            first_invoice.amount_due = first_invoice.amount_due / billing_schedules.get(self.policy.billing_schedule)
+            for i in range(1, billing_schedules.get(self.policy.billing_schedule)):
+                months_after_eff_date = i
+                bill_date = self.policy.effective_date + relativedelta(months=months_after_eff_date)
+                invoice = Invoice(self.policy.id,
+                                  bill_date,
+                                  bill_date + relativedelta(months=1),
+                                  bill_date + relativedelta(months=1, days=14),
+                                  self.policy.annual_premium / billing_schedules.get(self.policy.billing_schedule))
+                invoices.append(invoice)
+            print "Monthly billing schedule invoices have been created"
         else:
             print "You have chosen a bad billing schedule."
 

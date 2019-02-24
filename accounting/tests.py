@@ -47,9 +47,9 @@ class TestBillingSchedules(unittest.TestCase):
 
     def test_annual_billing_schedule(self):
         self.policy.billing_schedule = "Annual"
-        #No invoices currently exist
+        # No invoices currently exist
         self.assertFalse(self.policy.invoices)
-        #Invoices should be made when the class is initiated
+        # Invoices should be made when the class is initiated
         pa = PolicyAccounting(self.policy.id)
         self.assertEquals(len(self.policy.invoices), 1)
         self.assertEquals(self.policy.invoices[0].amount_due, self.policy.annual_premium)
