@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="82f74143-5464-4722-bbd8-05cfa1b68a0d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/accounting.sqlite" beforeDir="false" afterPath="$PROJECT_DIR$/accounting.sqlite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/accounting/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/accounting/models.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -26,24 +27,33 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/accounting/tests.py">
+        <entry file="file://$PROJECT_DIR$/accounting/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="364">
-              <caret line="123" column="46" selection-start-line="123" selection-start-column="40" selection-end-line="123" selection-end-column="46" />
+            <state relative-caret-position="289">
+              <caret line="125" lean-forward="true" selection-start-line="125" selection-end-line="125" />
               <folding>
-                <element signature="e#27#42#0" expanded="true" />
+                <element signature="e#27#62#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/accounting/utils.py">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/accounting/models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
-              <caret line="135" lean-forward="true" selection-start-line="135" selection-end-line="135" />
+            <state relative-caret-position="340">
+              <caret line="26" column="29" lean-forward="true" selection-start-line="26" selection-start-column="29" selection-end-line="26" selection-end-column="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/accounting/tests.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="228">
+              <caret line="104" lean-forward="true" selection-start-line="104" selection-end-line="104" />
               <folding>
-                <element signature="e#27#62#0" expanded="true" />
+                <element signature="e#27#42#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -54,6 +64,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>self.policy.billing_schedule</find>
+      <find>`</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -65,6 +76,7 @@
         <option value="$PROJECT_DIR$/accounting/__init__.py" />
         <option value="$PROJECT_DIR$/accounting/utils.py" />
         <option value="$PROJECT_DIR$/accounting/tests.py" />
+        <option value="$PROJECT_DIR$/accounting/models.py" />
       </list>
     </option>
   </component>
@@ -153,7 +165,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32937366" />
       <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info active="true" anchor="bottom" x="67" y="57" width="1853" height="1023" id="Terminal" order="8" type="WINDOWED" visible="true" weight="0.562635" />
+      <window_info active="true" anchor="bottom" x="67" y="55" width="1853" height="1025" id="Terminal" order="8" type="WINDOWED" visible="true" weight="0.562635" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="10" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -238,8 +250,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/accounting/models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="48" column="23" lean-forward="true" selection-start-line="48" selection-start-column="23" selection-end-line="48" selection-end-column="23" />
+        <state relative-caret-position="340">
+          <caret line="26" column="29" lean-forward="true" selection-start-line="26" selection-start-column="29" selection-end-line="26" selection-end-column="29" />
         </state>
       </provider>
     </entry>
@@ -251,22 +263,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/accounting/tests.py">
+    <entry file="file://$PROJECT_DIR$/accounting/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
-          <caret line="123" column="46" selection-start-line="123" selection-start-column="40" selection-end-line="123" selection-end-column="46" />
+        <state relative-caret-position="289">
+          <caret line="125" lean-forward="true" selection-start-line="125" selection-end-line="125" />
           <folding>
-            <element signature="e#27#42#0" expanded="true" />
+            <element signature="e#27#62#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/accounting/utils.py">
+    <entry file="file://$PROJECT_DIR$/accounting/tests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="135" lean-forward="true" selection-start-line="135" selection-end-line="135" />
+        <state relative-caret-position="228">
+          <caret line="104" lean-forward="true" selection-start-line="104" selection-end-line="104" />
           <folding>
-            <element signature="e#27#62#0" expanded="true" />
+            <element signature="e#27#42#0" expanded="true" />
           </folding>
         </state>
       </provider>

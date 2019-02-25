@@ -116,11 +116,6 @@ class PolicyAccounting(object):
         for invoice in self.policy.invoices:
             invoice.delete()
 
-        """
-            Note for when solving problem 5 :
-            todo: fix the naming of "Semi-Annual", the conditions bellow checks for "Two-Pay"
-            also, shouldn't the value be 2 instead of 3 ? 
-        """
         # the divisor by which the amount_due value (total amount) should be divided
         billing_schedules = {'Annual': None, 'Semi-Annual': 3, 'Quarterly': 4, 'Monthly': 12}
 

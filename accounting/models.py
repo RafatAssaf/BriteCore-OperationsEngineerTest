@@ -13,15 +13,25 @@ class Policy(db.Model):
     policy_number = db.Column(u'policy_number', db.VARCHAR(length=128), nullable=False)
     effective_date = db.Column(u'effective_date', db.DATE(), nullable=False)
     status = db.Column(u'status', db.Enum(u'Active', u'Canceled', u'Expired'), default=u'Active', nullable=False)
-    billing_schedule = db.Column(u'billing_schedule', db.Enum(u'Annual', u'Two-Pay', u'Quarterly', u'Monthly'), default=u'Annual', nullable=False)
+    billing_schedule = db.Column(u'billing_schedule', db.Enum(u'Annual', u'Two-Pay', u'Quarterly', u'Monthly'), nullable=False)
     annual_premium = db.Column(u'annual_premium', db.INTEGER(), nullable=False)
     named_insured = db.Column(u'named_insured', db.INTEGER(), db.ForeignKey('contacts.id'))
     agent = db.Column(u'agent', db.INTEGER(), db.ForeignKey('contacts.id'))
 
-    def __init__(self, policy_number, effective_date, annual_premium):
+    def __init__(self,
+                 policy_number,
+                 effective_date,
+                 annual_premium,
+                 billing_schedule=u'Annual',
+                 named_insured=None,
+                 agent=None):
         self.policy_number = policy_number
         self.effective_date = effective_date
         self.annual_premium = annual_premium
+        self.billing_schedule = billing_schedule
+        self.named_insured = named_insured
+        self.agent = agent
+
 
     invoices = db.relation('Invoice', primaryjoin="Invoice.policy_id==Policy.id")
 
