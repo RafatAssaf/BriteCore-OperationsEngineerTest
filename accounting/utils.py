@@ -69,33 +69,33 @@ class PolicyAccounting(object):
             db.session.commit()
             return payment
         else:
-            try:
-                contact_id = self.policy.named_insured  # named insured id instead of agent id ?
-                # create the payment instance
-                payment = Payment(self.policy.id,
-                                  contact_id,
-                                  amount,
-                                  date_cursor)
-                # update DB
-                db.session.add(payment)
-                db.session.commit()
-                return payment
-            except IntegrityError:
-                db.session.rollback()
-                raise ValueError("This Policy has no named insured registered, you should specify (contact_id)")
+            if self.evaluate_cancellation_pending_due_to_non_pay(date_cursor):
+                print("This policy is pending cancellation due to non-pay, only an agent can make payments on it.")
+            else:
+                try:
+                    contact_id = self.policy.named_insured  # named insured id instead of agent id ?
+                    # create the payment instance
+                    payment = Payment(self.policy.id,
+                                      contact_id,
+                                      amount,
+                                      date_cursor)
+                    # update DB
+                    db.session.add(payment)
+                    db.session.commit()
+                    return payment
+                except IntegrityError:
+                    db.session.rollback()
+                    raise ValueError("This Policy has no named insured registered, you should specify (contact_id)")
 
 
 
 
     def evaluate_cancellation_pending_due_to_non_pay(self, date_cursor=None):
-        """
-         TODO: implement this function
-         If this function returns true, an invoice
-         on a policy has passed the due date without
-         being paid in full. However, it has not necessarily
-         made it to the cancel_date yet.
-        """
-        pass
+        """ Returns (True) if the policy has in invoice pending cancellation due to non-pay, and (False) otherwise """
+        return len(Invoice.query.filter_by(policy_id=self.policy.id)\
+            .filter(Invoice.due_date <= date_cursor)\
+            .filter(date_cursor < Invoice.cancel_date)\
+            .all()) > 0
 
     def evaluate_cancel(self, date_cursor=None):
         if not date_cursor:
