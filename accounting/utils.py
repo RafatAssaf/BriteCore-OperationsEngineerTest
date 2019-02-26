@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 
 from accounting import db
 from models import Contact, Invoice, Payment, Policy
+from sqlalchemy.exc import IntegrityError
 
 """
 #######################################################
@@ -57,26 +58,34 @@ class PolicyAccounting(object):
             # default date cursor is current date
             date_cursor = datetime.now().date()
 
-        if not contact_id:
+        if contact_id:
+            # create the payment instance
+            payment = Payment(self.policy.id,
+                              contact_id,
+                              amount,
+                              date_cursor)
+            # update DB
+            db.session.add(payment)
+            db.session.commit()
+            return payment
+        else:
             try:
-                # try to access named_insured value instead
-                contact_id = self.policy.named_insured
-            except:
-                # if no contact_id provided and the policy don't have named insured then abort operation
-                print "Warning: no contact ID was provided and the policy does not have named insured"
-                # FIXME: payments should not be created without contact ID
-                pass
+                contact_id = self.policy.named_insured  # named insured id instead of agent id ?
+                # create the payment instance
+                payment = Payment(self.policy.id,
+                                  contact_id,
+                                  amount,
+                                  date_cursor)
+                # update DB
+                db.session.add(payment)
+                db.session.commit()
+                return payment
+            except IntegrityError:
+                db.session.rollback()
+                raise ValueError("This Policy has no named insured registered, you should specify (contact_id)")
 
-        # create the payment instance
-        payment = Payment(self.policy.id,
-                          contact_id,
-                          amount,
-                          date_cursor)
-        # update DB
-        db.session.add(payment)
-        db.session.commit()
 
-        return payment
+
 
     def evaluate_cancellation_pending_due_to_non_pay(self, date_cursor=None):
         """
