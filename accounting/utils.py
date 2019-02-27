@@ -31,7 +31,8 @@ class PolicyAccounting(object):
             date_cursor = datetime.now().date()
 
         # get all invoices for this policy with billing date before the date cursor (ordered by billing date)
-        invoices = Invoice.query.filter_by(policy_id=self.policy.id)\
+        invoices = Invoice.query.filter_by(policy_id=self.policy.id) \
+                                .filter_by(deleted=0) \
                                 .filter(Invoice.bill_date <= date_cursor)\
                                 .order_by(Invoice.bill_date)\
                                 .all()
@@ -87,9 +88,6 @@ class PolicyAccounting(object):
                     db.session.rollback()
                     raise ValueError("This Policy has no named insured registered, you should specify (contact_id)")
 
-
-
-
     def evaluate_cancellation_pending_due_to_non_pay(self, date_cursor=None):
         """ Returns (True) if the policy has in invoice pending cancellation due to non-pay, and (False) otherwise """
         return len(Invoice.query.filter_by(policy_id=self.policy.id)\
@@ -119,7 +117,6 @@ class PolicyAccounting(object):
         else:
             print "THIS POLICY SHOULD NOT CANCEL"
 
-
     def make_invoices(self):
         # clear policy's invoices
         for invoice in self.policy.invoices:
@@ -145,11 +142,6 @@ class PolicyAccounting(object):
             # due amount is 1 Nth of the total amount where N is the value of the policy's billing schedule
             first_invoice.amount_due = first_invoice.amount_due / billing_schedules.get(self.policy.billing_schedule)
 
-            """
-                TODO: replace this loop with another assingment statement. 
-                This loop is always going to create only one more invoice since the first 
-                ticket is already created given that billing_schedule[Semi-Annual] is 2, not 3.
-            """
             for i in range(1, billing_schedules.get(self.policy.billing_schedule)):
                 # for Semi-Annual scheduling, we have 6 months between invoices. that is: (12 months / 2 invoices)
                 months_after_eff_date = i*6
@@ -196,6 +188,54 @@ class PolicyAccounting(object):
         for invoice in invoices:
             db.session.add(invoice)
         db.session.commit()
+
+    def change_schedule(self, date_cursor, new_billing_schedule):
+        """This function transfers the policy to new billing schedule"""
+        if not date_cursor:
+            # default date cursor is current date
+            date_cursor = datetime.now().date()
+
+        amount_to_reschedule = self.return_account_balance()  # amount left from old billing schedule
+
+        try:
+            # try to extract rescheduling factor
+            reschedule_factor = ({"Annual": 12, "Two-Pay": 6, "Quarterly": 3, "Monthly": 1})[new_billing_schedule]
+        except KeyError:
+            raise ValueError("Billing schedule: {} is not defined".format(new_billing_schedule))
+
+        months_left_count = ((self.policy.effective_date + relativedelta(months=12)) - date_cursor).days / 30
+
+        # a policy should not convert to schedule the number of months left < rescheduling factor
+        # i.e. a Monthly policy cannot convert to Quarterly policy if the policy has 2 months left before it ends
+        if months_left_count < reschedule_factor or date_cursor > self.policy.effective_date + relativedelta(years=1):
+            raise ValueError("Could not convert policy to billing schedule: {}, date cursor is too late"
+                             .format(new_billing_schedule))
+        if date_cursor < self.policy.effective_date:
+            raise ValueError("Could not convert policy to billing schedule: {}, policy is not effective at date cursor"
+                             .format(new_billing_schedule))
+
+        # how many new invoices should be created
+        invoices_left_count = months_left_count / reschedule_factor
+        new_invoices = []
+        for i in range(1, invoices_left_count + 1):
+            cursor = (date_cursor + relativedelta(months=i*reschedule_factor))
+            bill_date = date(cursor.year, cursor.month, self.policy.effective_date.day)
+            invoice = Invoice(self.policy.id,
+                              bill_date,
+                              bill_date + relativedelta(months=1),
+                              bill_date + relativedelta(months=1, days=14),
+                              amount_to_reschedule / float(invoices_left_count))
+            new_invoices.append(invoice)
+
+        for invoice in new_invoices:
+            db.session.add(invoice)
+
+        for invoice in self.policy.invoices:
+            invoice.deleted = 1
+
+        self.policy.billing_schedule = new_billing_schedule
+        db.session.commit()
+        print("Policy schedule was successfully changed to {} billing schedule".format(new_billing_schedule))
 
 ################################
 # The functions below are for the db and 
