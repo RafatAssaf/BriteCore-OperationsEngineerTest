@@ -59,7 +59,9 @@ class PolicyAccounting(object):
             # default date cursor is current date
             date_cursor = datetime.now().date()
 
-        if contact_id:
+        if self.policy.status == 'Canceled':
+            print("This payment was canceled.")
+        elif contact_id:
             # create the payment instance
             payment = Payment(self.policy.id,
                               contact_id,
@@ -96,6 +98,7 @@ class PolicyAccounting(object):
             .all()) > 0
 
     def evaluate_cancel(self, date_cursor=None):
+        """ Check policy and cancel it if any invoice has reached cancel date without being paid """
         if not date_cursor:
             # default date cursor is current date
             date_cursor = datetime.now().date()
@@ -113,9 +116,27 @@ class PolicyAccounting(object):
             else:
                 # if an invoice was not paid before it's cancellation date, then the policy should cancel
                 print "THIS POLICY SHOULD HAVE CANCELED"
+                self.policy.status = u'Canceled'
+                self.policy.status_info = "Policy was canceled due to non-pay"
+                self.policy.cancellation_date = invoice.cancel_date
+                db.session.commit()
                 break
         else:
             print "THIS POLICY SHOULD NOT CANCEL"
+
+    def cancel_policy(self, cancellation_cause=None, date_cursor=None):
+        """ Cancel the policy anyways """
+        if not date_cursor:
+            date_cursor = datetime.now().date()
+        if not cancellation_cause:
+            cancellation_cause = "Policy was cancelled on demand"
+        self.policy.status = u'Canceled'
+        self.policy.cancellation_date = date_cursor
+        self.policy.status_info = cancellation_cause
+
+        # mark all policy's invoices deleted ??
+
+        db.session.commit()
 
     def make_invoices(self):
         # clear policy's invoices
@@ -189,8 +210,12 @@ class PolicyAccounting(object):
             db.session.add(invoice)
         db.session.commit()
 
-    def change_schedule(self, date_cursor, new_billing_schedule):
+    def change_schedule(self, new_billing_schedule, date_cursor=None):
         """This function transfers the policy to new billing schedule"""
+        if self.policy.status == 'Canceled':
+            print("This policy was canceled.")
+            return
+
         if not date_cursor:
             # default date cursor is current date
             date_cursor = datetime.now().date()

@@ -17,20 +17,27 @@ class Policy(db.Model):
     annual_premium = db.Column(u'annual_premium', db.INTEGER(), nullable=False)
     named_insured = db.Column(u'named_insured', db.INTEGER(), db.ForeignKey('contacts.id'))
     agent = db.Column(u'agent', db.INTEGER(), db.ForeignKey('contacts.id'))
+    status_info = db.Column(u'status_info', db.VARCHAR(length=128), nullable=False)
+    cancellation_date = db.Column(u'cancellation_date', db.DATE, nullable=True)
 
     def __init__(self,
                  policy_number,
                  effective_date,
                  annual_premium,
+                 status_info="Created",
                  billing_schedule=u'Annual',
                  named_insured=None,
-                 agent=None):
+                 agent=None,
+                 cancellation_date=None
+                 ):
         self.policy_number = policy_number
         self.effective_date = effective_date
         self.annual_premium = annual_premium
         self.billing_schedule = billing_schedule
         self.named_insured = named_insured
         self.agent = agent
+        self.status_info = status_info
+        self.cancellation_date = cancellation_date
 
 
     invoices = db.relation('Invoice', primaryjoin="Invoice.policy_id==Policy.id")
