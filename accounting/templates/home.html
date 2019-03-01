@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for policy in policies %}
+        <h1>{{ policy.number }}</h1>
+        <p>{{ policy.billing_schedule }}</p>
+    {% endfor %}
+{% endblock content %}
