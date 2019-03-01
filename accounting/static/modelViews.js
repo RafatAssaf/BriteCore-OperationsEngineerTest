@@ -1,6 +1,7 @@
 function contentViewModel() {
     var self = this
 
+    /* defining policy number observable and it's validations */
     self.policyNumber = ko.observable("").extend({
         required: true,
         maxLength: 128 // from model definition
@@ -12,6 +13,7 @@ function contentViewModel() {
         return moment(d).isBefore(moment())
     }
 
+    /* defining date cursor observable and it's validations */
     self.dateCursor = ko.observable(formattedDateString).extend({
         // custom validator
         validation: {
@@ -36,10 +38,6 @@ function contentViewModel() {
             });
             return false
         }
-    }
-
-    self.log = function() {
-        console.log(self.policyNumber.isValid())
     }
 }
 
