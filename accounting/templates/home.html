@@ -1,7 +1,45 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% for policy in policies %}
-        <h1>{{ policy.number }}</h1>
-        <p>{{ policy.billing_schedule }}</p>
-    {% endfor %}
+<br/>
+<form>
+    <div class="form-group">
+        <label for="policyNumber">Policy Number</label>
+        <input type="text" data-bind="value:policyNumber" class="form-control" id="policyNumber" placeholder="Enter policy number">
+        <!--<span class="help-block text-danger">Something may have gone wrong</span>-->
+    </div>
+    <div class="form-group">
+        <label for="dateCursor">Date Cursor</label>
+        <input type="date" data-bind="value:dateCursor" class="form-control" id="dateCursor" placeholder="Enter date">
+    </div>
+    <button type="button" data-bind="click:lookupPolicy" class="btn btn-primary">Search</button>
+    <button type="button" data-bind="click:log" class="btn btn-primary">Log</button>
+</form>
+<br/>
+<!--Viewing account balance-->
+<h3 data-bind="visible: policy().account_balance">Account Balance: <strong data-bind="text:policy().account_balance"></strong></h3>
+<br/>
+<!--Viewing invoices table-->
+<table class="table table-striped" data-bind="visible: invoices()">
+  <thead>
+    <tr>
+      <th scope="col">Invoice ID</th>
+      <th scope="col">Amount Due</th>
+      <th scope="col">Bill Date</th>
+      <th scope="col">Due Date</th>
+      <th scope="col">Cancel Date</th>
+      <th scope="col">Deleted</th>
+    </tr>
+  </thead>
+  <tbody data-bind="foreach: invoices">
+    <tr>
+      <th data-bind="text:id"></th>
+      <td data-bind="text:amount_due"></td>
+      <td data-bind="text:bill_date"></td>
+      <td data-bind="text:due_date"></td>
+      <td data-bind="text:cancel_date"></td>
+      <td data-bind="text:deleted"></td>
+    </tr>
+  </tbody>
+</table>
+
 {% endblock content %}

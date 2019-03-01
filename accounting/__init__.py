@@ -1,6 +1,7 @@
-#You will need to pip install flask and the sqlalchemy extension for flask.
+# You will need to pip install flask and the sqlalchemy extension for flask.
 from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
+# from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 # Initialize the application.
 app = Flask(__name__)
