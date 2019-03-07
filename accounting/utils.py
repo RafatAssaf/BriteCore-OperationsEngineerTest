@@ -141,10 +141,10 @@ class PolicyAccounting(object):
     def make_invoices(self):
         # clear policy's invoices
         for invoice in self.policy.invoices:
-            invoice.delete()
+            invoice.deleted = 1  # marking invoices as deleted instead of actually removing them from DB
 
         # the divisor by which the amount_due value (total amount) should be divided
-        billing_schedules = {'Annual': None, 'Semi-Annual': 3, 'Quarterly': 4, 'Monthly': 12}
+        billing_schedules = {'Annual': None, 'Two-Pay': 3, 'Quarterly': 4, 'Monthly': 12}
 
         invoices = []
 
@@ -211,7 +211,10 @@ class PolicyAccounting(object):
         db.session.commit()
 
     def change_schedule(self, new_billing_schedule, date_cursor=None):
-        """This function transfers the policy to new billing schedule"""
+        """
+            This function transfers the policy to new billing schedule
+            Deprecated: this function may yield fluctuating invoices because of the pricing approach
+        """
         if self.policy.status == 'Canceled':
             print("This policy was canceled.")
             return
@@ -261,6 +264,44 @@ class PolicyAccounting(object):
         self.policy.billing_schedule = new_billing_schedule
         db.session.commit()
         print("Policy schedule was successfully changed to {} billing schedule".format(new_billing_schedule))
+
+    def change_schedule_normalized(self, new_billing_schedule, date_cursor=None):
+        """
+            A simpler normalized rescheduling function
+            Motivated by the feedback from BriteCore hiring team to implement the logic demonstrated bellow
+            :returns the closest unpaid invoice
+        """
+        if self.policy.status == 'Canceled':
+            print("This policy was canceled.")
+            return
+
+        if not date_cursor:
+            # default date cursor is current date
+            date_cursor = datetime.now().date()
+
+        # amount to reschedule = annual premium
+        # change policy's billing schedule
+        self.policy.billing_schedule = new_billing_schedule
+        # re-make invoices
+        self.make_invoices()
+        # return the last one that remains unpaid
+        payments = Payment.query.filter_by(policy_id=self.policy.id).all()
+        invoices = Invoice.query.filter_by(policy_id=self.policy.id) \
+            .filter_by(deleted=0) \
+            .order_by(Invoice.bill_date) \
+            .all()
+
+        # sum payments
+        amount_paid = reduce(lambda acc, payment: acc + payment.amount_paid, payments, 0)
+        amount_due = 0
+        next_invoice = invoices[0]
+        for invoice in invoices:
+            amount_due += invoice.amount_due
+            if amount_due < amount_paid:
+                next_invoice = invoice
+                break
+
+        return next_invoice
 
 ################################
 # The functions below are for the db and 
